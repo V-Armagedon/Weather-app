@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
-    private val repsitory: WeatherRepository,
+    private val repository: WeatherRepository,
     private val locationTracker: LocationTracker
 ): ViewModel(){
 
@@ -28,7 +28,7 @@ class WeatherViewModel @Inject constructor(
                 error = null
             )
             locationTracker.getCurrentLocation()?.let{location ->
-                when(val result = repsitory.getWeatherData(location.latitude, location.longitude)) {
+                when(val result = repository.getWeatherData(location.latitude, location.longitude)) {
                     is Resource.Success -> {
                         state = state.copy(
                             weatherInfo = result.data,
@@ -47,7 +47,7 @@ class WeatherViewModel @Inject constructor(
             } ?: kotlin.run {
                 state = state.copy(
                     isLoading = false,
-                    error = "Couldn`t retrieve locatiton. Make sure to grant permission and enable GPS"
+                    error = "Couldn't retrieve location. Make sure to grant permission and enable GPS"
                 )
             }
         }
