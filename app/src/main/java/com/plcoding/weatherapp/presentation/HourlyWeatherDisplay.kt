@@ -17,12 +17,12 @@ import com.plcoding.weatherapp.domain.weather.WeatherData
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun HourlyWeatherDispaly(
+fun HourlyWeatherDisplay(
     weatherData: WeatherData,
     modifier: Modifier = Modifier,
     textColor: Color = Color.White
-){
-    val formattedTime = remember(weatherData){
+) {
+    val formattedTime = remember(weatherData) {
         weatherData.time.format(
             DateTimeFormatter.ofPattern("HH:mm")
         )
@@ -34,15 +34,15 @@ fun HourlyWeatherDispaly(
     ) {
         Text(
             text = formattedTime,
-            color = Color.Gray
+            color = Color.LightGray
         )
-        Image(painter = painterResource(
-            id = weatherData.weatherType.iconRes),
+        Image(
+            painter = painterResource(id = weatherData.weatherType.iconRes),
             contentDescription = null,
             modifier = Modifier.width(40.dp)
         )
         Text(
-            text = "${weatherData.temperatureCelsius}ºC",
+            text = "${weatherData.temperatureCelsius}°C",
             color = textColor,
             fontWeight = FontWeight.Bold
         )
