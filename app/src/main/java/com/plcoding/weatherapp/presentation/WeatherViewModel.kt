@@ -15,40 +15,43 @@ import javax.inject.Inject
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
     private val repository: WeatherRepository,
-    private val locationTracker: LocationTracker
-): ViewModel() {
-
+    private val locationTracker: LocationTracker,
+) : ViewModel() {
+    var latitude: Double = 0.0
+    var longitude: Double = 0.0
     var state by mutableStateOf(WeatherState())
         private set
 
-    fun loadWeatherInfo() {
+    fun loadWeatherInfo(lat: Double?, long: Double?) {
         viewModelScope.launch {
             state = state.copy(
                 isLoading = true,
                 error = null
             )
-            locationTracker.getCurrentLocation()?.let { location ->
-                when(val result = repository.getWeatherData(location.latitude, location.longitude)) {
-                    is Resource.Success -> {
-                        state = state.copy(
-                            weatherInfo = result.data,
-                            isLoading = false,
-                            error = null
-                        )
-                    }
-                    is Resource.Error -> {
-                        state = state.copy(
-                            weatherInfo = null,
-                            isLoading = false,
-                            error = result.message
-                        )
-                    }
+            if (lat == null || long == null){
+                locationTracker.getCurrentLocation()?.let { location ->
+                    latitude = location.latitude
+                    longitude = location.longitude
                 }
-            } ?: kotlin.run {
-                state = state.copy(
-                    isLoading = false,
-                    error = "Couldn't retrieve location. Make sure to grant permission and enable GPS."
-                )
+            }else{
+                latitude = lat
+                longitude = long
+            }
+            when (val result = repository.getWeatherData(latitude, longitude)) {
+                is Resource.Success -> {
+                    state = state.copy(
+                        weatherInfo = result.data,
+                        isLoading = false,
+                        error = null
+                    )
+                }
+                is Resource.Error -> {
+                    state = state.copy(
+                        weatherInfo = null,
+                        isLoading = false,
+                        error = result.message
+                    )
+                }
             }
         }
     }
