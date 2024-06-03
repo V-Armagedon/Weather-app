@@ -29,11 +29,18 @@ class DefaultLocationTracker @Inject constructor(
             application,
             Manifest.permission.ACCESS_COARSE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
-
+//        val ReadFile = ContextCompat.checkSelfPermission(
+//            application,
+//            Manifest.permission.READ_EXTERNAL_STORAGE
+//        ) == PackageManager.PERMISSION_GRANTED
+//        val WriteFile = ContextCompat.checkSelfPermission(
+//            application,
+//            Manifest.permission.WRITE_EXTERNAL_STORAGE
+//        ) == PackageManager.PERMISSION_GRANTED
         val locationManager = application.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) ||
                 locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        if(!hasAccessCoarseLocationPermission || !hasAccessFineLocationPermission || !isGpsEnabled) {
+        if(!hasAccessCoarseLocationPermission || !hasAccessFineLocationPermission || !isGpsEnabled/* || !ReadFile || !WriteFile*/) {
             return null
         }
 

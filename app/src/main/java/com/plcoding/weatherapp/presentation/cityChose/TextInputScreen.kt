@@ -30,6 +30,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.plcoding.weatherapp.presentation.WeatherViewModel
+import java.util.Timer
+import kotlin.concurrent.schedule
+
+//val filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath + "/Cities.json"
 
 data class City(val name: String, val latitude: Double, val longitude: Double)
 
@@ -39,6 +43,8 @@ fun CitySelectionScreen(navController: NavController, viewModel: WeatherViewMode
     var long by remember { mutableStateOf("") }
     var lat by remember { mutableStateOf("") }
     var itemList by remember { mutableStateOf(listOf<String>()) }
+    val timer = Timer()
+    var btntxt = "Add city"
 
     var cities = mutableListOf(
         City("Kyiv", 50.4501, 30.5234),
@@ -54,22 +60,30 @@ fun CitySelectionScreen(navController: NavController, viewModel: WeatherViewMode
         OutlinedTextField(
             value = text,
             onValueChange = { text = it },
-            label = { Text("Enter item") },
+            label = { Text("Enter city") },
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.LightGray)
         )
         OutlinedTextField(
             value = lat,
-            onValueChange = { lat = it },
-            label = { Text("Enter Lattitude") },
+            onValueChange = {
+                if(it.length <= 3){
+                    lat = it
+                }
+            },
+            label = { Text("Enter Latitude") },
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.LightGray)
         )
         OutlinedTextField(
             value = long,
-            onValueChange = { long = it },
+            onValueChange = {
+                if(it.length <= 3){
+                    long = it
+                }
+                            },
             label = { Text("Enter Longitude") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -81,16 +95,30 @@ fun CitySelectionScreen(navController: NavController, viewModel: WeatherViewMode
             Button(
                 modifier = Modifier.weight(1f),
                 onClick = {
-                    if (text.isNotBlank()) {
-                        if (text.isNotBlank()) {
-                            cities.add(City(text, lat.toDouble(), long.toDouble()))
-                            itemList = itemList + text
-                            text = ""
+                    try {
+                        if (text.isNotBlank() || lat.isNotBlank() || long.isNotBlank()) {
+                            if(lat.toDouble() >= -90 && lat.toDouble()<=90 && long.toDouble() >= -90 && long.toDouble()<=90) {
+                                itemList = itemList + text
+                                //saveDataToJsonFile(City(text, lat.toDouble(), long.toDouble()), filePath)
+                                text = ""
+                            }else{
+                                timer.schedule(0, 1000){
+                                    btntxt = "Enter the correct value"
+                                }
+                                btntxt = "Add city"
+                            }
+                        }else{
+                            timer.schedule(0, 1000) {
+                                btntxt = "Fill all fields"
+                            }
+                            btntxt = "Add city"
                         }
+                    }catch (exeption: Exception){
+                        text = exeption.toString()
                     }
                 }
             ) {
-                Text("Add Item")
+                Text(btntxt)
             }
             Button(
                 modifier = Modifier
@@ -112,20 +140,32 @@ fun CitySelectionScreen(navController: NavController, viewModel: WeatherViewMode
             items(itemList) { item ->
                 Row(
                     modifier = Modifier
+                        .weight(1f)
                         .fillMaxWidth()
                         .padding(vertical = 4.dp)
-                        .background(Color.Blue)
+                        .background(Color.Gray)
                         .clickable {
-                            //viewModel.loadWeatherInfo(city.latitude, city.longitude)
+                            //cities = getDataFromJsonFile(filePath)
+                            //var data = cities.filter { it.name == item }
+                            //data.forEach { city ->
+                            viewModel.loadWeatherInfo(lat.toDouble(), long.toDouble())
                             navController.navigate("weather_screen")
+                            //}
                         },
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = item, modifier = Modifier.weight(1f).align(Alignment.CenterVertically).padding(start = 6.dp))
+                    Text(
+                        text = item,
+                        modifier = Modifier
+                            .weight(1f)
+                            .align(Alignment.CenterVertically)
+                            .padding(start = 6.dp)
+                    )
                     Icon(imageVector = Icons.Default.Delete,
                         contentDescription = "Delete",
                         modifier = Modifier
                             .clickable {
+                                //removeDatafromJsonFile(City(text, lat.toDouble(), long.toDouble()), filePath)
                                 itemList = itemList.filter { it != item }
                             }
                             .padding(8.dp)
@@ -135,3 +175,48 @@ fun CitySelectionScreen(navController: NavController, viewModel: WeatherViewMode
         }
     }
 }
+//fun saveDataToJsonFile(data: City, filePath: String) {
+//    val jsonArray = JSONArray()
+//    val jsonObj = JSONObject()
+//    jsonObj.put("name", data.name)
+//    jsonObj.put("lat", data.latitude)
+//    jsonObj.put("long", data.longitude)
+//    jsonArray.put(jsonObj)
+//    val jsonString = jsonArray.toString()
+//    val file = File(filePath)
+//    file.writeText(jsonString)
+//}
+//fun getDataFromJsonFile(filePath: String): MutableList<City> {
+//    val file = File(filePath)
+//    val jsonText = file.readText()
+//    val jsonArray = JSONArray(jsonText)
+//    val cities = mutableListOf<City>()
+//
+//    for (i in 0 until jsonArray.length()) {
+//        val jsonObj = jsonArray.getJSONObject(i)
+//        val text = jsonObj.getString("name")
+//        val lat = jsonObj.getDouble("lat")
+//        val long = jsonObj.getDouble("long")
+//        cities.add(City(text, lat, long))
+//    }
+//    return cities
+//}
+//fun removeDatafromJsonFile(dataToRemove: City, filePath: String) {
+//    val jsonString = File(filePath).readText()
+//    val jsonArray = JSONArray(jsonString)
+//
+//    // Remove the data to be deleted
+//    val updatedArray = JSONArray()
+//    for (i in 0 until jsonArray.length()) {
+//        val jsonObject = jsonArray.getJSONObject(i)
+//        val city = City(
+//            jsonObject.getString("name"),
+//            jsonObject.getDouble("lat"),
+//            jsonObject.getDouble("long")
+//        )
+//        if (city != dataToRemove) {
+//            updatedArray.put(jsonObject)
+//        }
+//    }
+//    File(filePath).writeText(updatedArray.toString())
+//}
