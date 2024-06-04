@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
         ) { permissions ->
             if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == false ||
                 permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == false){
-                    viewModel.loadWeatherInfo(9999.0, 9999.0)
+                    viewModel.loadWeatherInfo(999999.0, 999999.0)
             }
         }
         permissionLauncher.launch(arrayOf(

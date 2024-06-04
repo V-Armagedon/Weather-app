@@ -68,7 +68,7 @@ fun CitySelectionScreen(navController: NavController, viewModel: WeatherViewMode
         OutlinedTextField(
             value = lat,
             onValueChange = {
-                if(it.length <= 3){
+                if(it.length <= 6){
                     lat = it
                 }
             },
@@ -80,7 +80,7 @@ fun CitySelectionScreen(navController: NavController, viewModel: WeatherViewMode
         OutlinedTextField(
             value = long,
             onValueChange = {
-                if(it.length <= 3){
+                if(it.length <= 6){
                     long = it
                 }
                             },
@@ -97,7 +97,7 @@ fun CitySelectionScreen(navController: NavController, viewModel: WeatherViewMode
                 onClick = {
                     try {
                         if (text.isNotBlank() || lat.isNotBlank() || long.isNotBlank()) {
-                            if(lat.toDouble() >= -90 && lat.toDouble()<=90 && long.toDouble() >= -90 && long.toDouble()<=90) {
+                            if(lat.toDouble() >= -90 && lat.toDouble()<=90 && long.toDouble() >= -180 && long.toDouble()<=180) {
                                 itemList = itemList + text
                                 //saveDataToJsonFile(City(text, lat.toDouble(), long.toDouble()), filePath)
                                 text = ""

@@ -33,7 +33,7 @@ class WeatherViewModel @Inject constructor(
                     latitude = location.latitude
                     longitude = location.longitude
                 }
-            }else if (lat == 9999.0 && long == 9999.0) {
+            }else if (lat == 999999.0 && long == 999999.0) {
                 when (val result = repository.getWeatherData(lat, long)) {
                     is Resource.Error -> {
                         state = state.copy(
